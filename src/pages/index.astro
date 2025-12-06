@@ -79,7 +79,9 @@ const allTags = [...new Set(allProjects.flatMap((p) => p.data.tags))];
             <!-- 圖片區 -->
             <div class="relative h-64 overflow-hidden">
               <img 
-                src={project.data.image} 
+                  /* 這裡是最關鍵的修改！ */
+                /* 邏輯：基本路徑 (/BuildingBlocks/) + 圖片路徑 (images/photo1.jpg) */
+                src={import.meta.env.BASE_URL + project.data.image.replace(/^\//, '')} 
                 alt={project.data.title} 
                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
