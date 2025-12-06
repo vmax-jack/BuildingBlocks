@@ -1,0 +1,75 @@
+---
+import { getCollection } from 'astro:content';
+import '../../styles/global.css'; // 引入樣式
+
+// 1. 生成靜態路徑 (因為是靜態網站，必須告訴 Astro 有哪些頁面要產出)
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map(project => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+// 2. 獲取傳入的專案資料
+const { project } = Astro.props;
+const { Content } = await project.render(); // 渲染 Markdown 內文
+---
+
+<html lang="zh-TW">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{project.data.title} | BLOCK JACK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+TC:wght@300;500;700&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-slate-900 text-slate-100 font-['Noto_Sans_TC'] min-h-screen">
+    
+    <!-- 導航列 (簡易版) -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+      <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+        <a href={import.meta.env.BASE_URL} class="text-cyan-400 font-['Orbitron'] hover:text-white transition">
+          &larr; BACK TO BASE
+        </a>
+        <div class="text-xs text-slate-500 font-mono">ID: {project.slug.toUpperCase()}</div>
+      </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-10">
+      
+      <!-- 標題區 -->
+      <div class="mb-8 border-l-4 border-cyan-500 pl-6">
+        <h1 class="text-4xl font-bold text-white mb-2">{project.data.title}</h1>
+        <div class="flex gap-4 text-sm text-slate-400 font-mono">
+          <span>CAT: {project.data.category}</span>
+          <span>DATE: {project.data.publishDate.toISOString().split('T')[0]}</span>
+        </div>
+      </div>
+
+      <!-- 大圖顯示 -->
+      <div class="rounded-xl overflow-hidden border border-slate-700 shadow-2xl shadow-cyan-900/20 mb-10">
+         <!-- 這裡也要記得加上 BASE_URL 修正圖片路徑 -->
+        <img 
+          src={import.meta.env.BASE_URL + project.data.image} 
+          alt={project.data.title}
+          class="w-full h-auto object-cover"
+        />
+      </div>
+
+      <!-- Markdown 內文區 -->
+      <article class="prose prose-invert prose-lg max-w-none prose-headings:text-cyan-300 prose-a:text-cyan-400">
+        <Content />
+      </article>
+
+      <!-- 底部標籤 -->
+      <div class="mt-12 pt-8 border-t border-slate-800 flex gap-2">
+        {project.data.tags.map(tag => (
+          <span class="px-3 py-1 bg-slate-800 text-cyan-400 text-sm rounded-full border border-slate-700">
+            #{tag}
+          </span>
+        ))}
+      </div>
+
+    </main>
+  </body>
+</html>
