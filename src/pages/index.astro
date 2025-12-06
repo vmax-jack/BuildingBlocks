@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import '../styles/global.css';  // <--- 加入這一行！
 
 // 1. 獲取所有專案資料
 const allProjects = await getCollection('projects');
